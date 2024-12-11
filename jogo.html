@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seletor de Personagens</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #000;
+            font-family: monospace;
+            color: #fff;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .char-box {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #fff;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .char-name {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 2px 5px;
+            text-align: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-size: 12px;
+        }
+
+        .selecionado-p1 {
+            border: 3px solid blue;
+        }
+
+        .selecionado-p2 {
+            border: 3px solid red;
+        }
+
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 16px;
+        }
+
+        #jogar {
+            display: none;
+            margin: 20px auto;
+            padding: 5px 10px;
+            font-size: 14px;
+            background: #000;
+            color: white;
+            border: 2px solid #fff;
+            cursor: pointer;
+        }
+
+        .char-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="status" id="status">Jogador 1, selecione seu personagem</div>
+    <div class="grid" id="grid"></div>
+    <button id="jogar">JOGAR</button>
+
+    <script>
+        let jogadorAtual = 1;
+        let p1Selecionado = null;
+        let p2Selecionado = null;
+      
+        localStorage.clear();
+
+        fetch('personagens.json')
+            .then(response => response.json())
+            .then(personagens => {
+                const grid = document.getElementById('grid');
+                
+                personagens.forEach(char => {
+                    const box = document.createElement('div');
+                    box.className = 'char-box';
+                    
+                    const img = document.createElement('img');
+                    img.src = char.image;
+                    img.alt = char.name;
+                    img.className = 'char-img'; 
+                    box.appendChild(img);
+
+                   
+                    const nameDiv = document.createElement('div');
+                    nameDiv.className = 'char-name';
+                    nameDiv.textContent = char.name;
+                    box.appendChild(nameDiv);
+
+                    box.dataset.charId = char.id;
+                    box.onclick = (event) => selecionarPersonagem(event, char);
+                    grid.appendChild(box);
+                });
+            });
+
+        function selecionarPersonagem(event, char) {
+            const box = event.currentTarget;
+
+            if (jogadorAtual === 1) {
+                if (p1Selecionado) {
+                    p1Selecionado.classList.remove('selecionado-p1');
+                }
+                box.classList.add('selecionado-p1');
+                p1Selecionado = box;
+
+                localStorage.setItem('char1', JSON.stringify({ id: char.id, name: char.name, status: "1" }));
+
+                jogadorAtual = 2;
+                document.getElementById('status').textContent = 'Jogador 2, selecione seu personagem';
+            } else {
+                if (p2Selecionado) {
+                    p2Selecionado.classList.remove('selecionado-p2');
+                }
+                box.classList.add('selecionado-p2');
+                p2Selecionado = box;
+
+                localStorage.setItem('char2', JSON.stringify({ id: char.id, name: char.name, status: "2" }));
+
+                document.getElementById('jogar').style.display = 'block';
+            }
+        }
+
+        document.getElementById('jogar').onclick = () => {
+            if (p1Selecionado && p2Selecionado) {
+                window.location.href = 'jogando.html';
+            }
+        };
+    </script>
+</body>
+</html>
