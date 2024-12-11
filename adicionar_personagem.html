@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+  --primary-color: #00ff00;
+  --secondary-color: #b926b9;
+  --text-color: #ffffff;
+  --background-color: #000000;
+  --input-background: #1a1a1a;
+  --input-border: #333333;
+  --button-hover: #00cc00;
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Arial', sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px var(--primary-color);
+}
+
+form {
+  background-color: rgba(255, 255, 255, 0.05);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+  width: 100%;
+  max-width: 500px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--secondary-color);
+  font-weight: bold;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  background-color: var(--input-background);
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  color: var(--text-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px var(--primary-color);
+}
+
+fieldset {
+  border: 1px solid var(--input-border);
+  border-radius: 5px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+legend {
+  color: var(--primary-color);
+  font-weight: bold;
+  padding: 0 10px;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  padding: 12px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  width: 100%;
+}
+
+button:hover {
+  background-color: var(--button-hover);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  form {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Custom file input styling */
+input[type="file"] {
+  border: 1px solid var(--input-border);
+  background-color: var(--input-background);
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  padding: 8px 16px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: var(--button-hover);
+}
+
+
+    </style>
+    <title>Adicionar Personagem</title>
+</head>
+<body>
+    <h1>Adicionar Novo Personagem</h1>
+    <form id="characterForm">
+        <label for="name">Nome do Personagem:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="vida">Vida:</label>
+        <input type="number" id="vida" name="vida" min="1" required>
+
+        <label for="dano">Dano:</label>
+        <input type="number" id="dano" name="dano" min="1" required>
+
+        <fieldset>
+            <legend>Sprites do Personagem</legend>
+
+            <label for="spriteParado">Sprite Parado (.png):</label>
+            <input type="file" id="spriteParado" name="spriteParado" accept="image/png" required>
+
+            <label for="spritePulando">Sprite Pulando (.png):</label>
+            <input type="file" id="spritePulando" name="spritePulando" accept="image/png" required>
+
+            <label for="spriteAndando">Sprite Andando (.png):</label>
+            <input type="file" id="spriteAndando" name="spriteAndando" accept="image/png" required>
+        </fieldset>
+
+        <button type="button" id="saveButton">Salvar Personagem</button>
+    </form>
+
+    <script>
+        document.getElementById('saveButton').addEventListener('click', () => {
+            const name = document.getElementById('name').value.trim();
+            const vida = document.getElementById('vida').value;
+            const dano = document.getElementById('dano').value;
+            const spriteParado = document.getElementById('spriteParado').files[0];
+            const spritePulando = document.getElementById('spritePulando').files[0];
+            const spriteAndando = document.getElementById('spriteAndando').files[0];
+
+            if (!name || !vida || !dano || !spriteParado || !spritePulando || !spriteAndando) {
+                alert('Por favor, preencha todos os campos e faça upload de todos os sprites.');
+                return;
+            }
+
+            // Cria um objeto zip para armazenar os arquivos
+            const zip = new JSZip();
+            const folder = zip.folder(name);
+
+            // Adiciona o arquivo XML
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<personagem>
+    <vida>${vida}</vida>
+    <dano>${dano}</dano>
+    <sprite url="${name}/parado.png" acao="parado"></sprite>
+    <sprite url="${name}/pulando.png" acao="pulando"></sprite>
+    <sprite url="${name}/andando.png" acao="andando"></sprite>
+</personagem>`;
+            folder.file('codigo.xml', xmlContent);
+
+            // Adiciona os sprites
+            const addFileToZip = (file, filename) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        folder.file(filename, event.target.result.split(',')[1], { base64: true });
+                        resolve();
+                    };
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            Promise.all([
+                addFileToZip(spriteParado, 'parado.png'),
+                addFileToZip(spritePulando, 'pulando.png'),
+                addFileToZip(spriteAndando, 'andando.png')
+            ]).then(() => {
+                // Gera o zip e oferece para download
+                zip.generateAsync({ type: 'blob' }).then((content) => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(content);
+                    a.download = `${name}.zip`;
+                    a.click();
+                });
+            }).catch((error) => {
+                console.error('Erro ao processar os arquivos:', error);
+                alert('Ocorreu um erro ao salvar o personagem.');
+            });
+        });
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</body>
+</html>
