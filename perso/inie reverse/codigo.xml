@@ -1,0 +1,5 @@
+<personagem>
+    <vida>100</vida>
+    <dano>10</dano>
+    <sprite url="perso/inie reverse/inie reverse.png" acao="parado"></sprite>
+</personagem>
