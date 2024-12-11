@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo de Luta</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2a2a2a;
+        }
+
+        .game-container {
+            height: 100vh;
+            position: relative;
+            background: #333;
+            border-bottom: 5px solid #444;
+        }
+
+        .player {
+            position: absolute;
+            bottom: 80px;
+        }
+
+        .player img {
+            height: 120px;
+        }
+
+        #player1 {
+            left: 100px;
+        }
+
+        #player2 {
+            right: 100px;
+            transform: scaleX(-1);
+        }
+
+        .health-bar {
+            height: 20px;
+            width: 200px;
+            background: #500;
+            border: 2px solid #fff;
+            position: absolute;
+            top: 20px;
+        }
+
+        #health1 { left: 20px; }
+        #health2 { right: 20px; }
+
+        .health-fill {
+            height: 100%;
+            background: red;
+            width: 100%;
+            transition: width 0.3s;
+        }
+
+        #joystick {
+            position: absolute;
+            bottom: 20px;
+            left: 20%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+        }
+
+        .player-name {
+            color: white;
+            position: absolute;
+            top: 45px;
+            font-family: Arial;
+        }
+
+        #name1 { left: 20px; }
+        #name2 { right: 20px; }
+
+        .buttons {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .attack-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: #ff4444;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .attack-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- aqui e o Player 1 -->
+        <div class="health-bar" id="health1">
+            <div class="health-fill" id="health1-fill"></div>
+        </div>
+        <div class="player-name" id="name1"></div>
+        <div id="player1" class="player">
+            <img id="sprite1" src="" alt="Player 1">
+        </div>
+
+        <!-- aqui e o Player 2 -->
+        <div class="health-bar" id="health2">
+            <div class="health-fill" id="health2-fill"></div>
+        </div>
+        <div class="player-name" id="name2"></div>
+        <div id="player2" class="player">
+            <img id="sprite2" src="" alt="Player 2">
+        </div>
+
+        <div id="joystick"></div>
+        <div class="buttons">
+            <button class="attack-btn" id="punch">👊</button>
+            <button class="attack-btn" id="kick">🦶</button>
+        </div>
+    </div>
+
+    <script>
+        let player1Position = 100;
+        let player2Position = window.innerWidth - 200;
+        let player1Speed = 0;
+        let isJumping = false;
+        let player1Y = 80;
+        let verticalSpeed = 0;
+        const gravity = 0.8;
+        
+        let player1Data = { vida: 100, dano: 0 };
+        let player2Data = { vida: 100, dano: 0 };
+
+        async function carregarPersonagens() {
+            try {
+                const response = await fetch('personagens.json');
+                const todosPersonagens = await response.json();
+
+                const p1Id = JSON.parse(localStorage.getItem('char1'))?.id;
+                const p2Id = JSON.parse(localStorage.getItem('char2'))?.id;
+
+                const player1 = p1Id ? todosPersonagens.find(p => p.id === p1Id) : null;
+                const player2 = p2Id ? todosPersonagens.find(p => p.id === p2Id) : null;
+
+                if (player1) {
+                    await interpretarCode('player1', player1.code);
+                    document.getElementById('name1').textContent = player1.name;
+                }
+
+                if (player2) {
+                    await interpretarCode('player2', player2.code);
+                    document.getElementById('name2').textContent = player2.name;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar personagens:', error);
+            }
+        }
+
+        async function interpretarCode(playerId, codeUrl) {
+            try {
+                const response = await fetch(codeUrl);
+                const xmlContent = await response.text();
+                
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
+
+                const vida = parseInt(xmlDoc.querySelector("vida")?.textContent || '100');
+                const dano = parseInt(xmlDoc.querySelector("dano")?.textContent || '0');
+                const sprite = xmlDoc.querySelector("sprite");
+                const spriteUrl = sprite?.getAttribute("url");
+
+                if (playerId === 'player1') {
+                    player1Data = { vida, dano };
+                } else {
+                    player2Data = { vida, dano };
+                }
+
+                if (spriteUrl) {
+                    document.getElementById(`sprite${playerId.slice(-1)}`).src = spriteUrl;
+                }
+
+                atualizarVida(playerId.slice(-1));
+            } catch (error) {
+                console.error(`Erro ao interpretar código do ${playerId}:`, error);
+            }
+        }
+
+        function atualizarVida(playerId) {
+            const vida = playerId === '1' ? player1Data.vida : player2Data.vida;
+            const healthFill = document.getElementById(`health${playerId}-fill`);
+            healthFill.style.width = `${vida}%`;
+        }
+
+        function aplicarDano(atacante, defensor) {
+            const dano = atacante === '1' ? player1Data.dano : player2Data.dano;
+            if (defensor === '1') {
+                player1Data.vida = Math.max(0, player1Data.vida - dano);
+                atualizarVida('1');
+            } else {
+                player2Data.vida = Math.max(0, player2Data.vida - dano);
+                atualizarVida('2');
+            }
+        }
+
+        function verificarColisao() {
+            const player1Elem = document.getElementById('player1');
+            const player2Elem = document.getElementById('player2');
+            const p1Rect = player1Elem.getBoundingClientRect();
+            const p2Rect = player2Elem.getBoundingClientRect();
+
+            return !(p1Rect.right < p2Rect.left || 
+                    p1Rect.left > p2Rect.right || 
+                    p1Rect.bottom < p2Rect.top || 
+                    p1Rect.top > p2Rect.bottom);
+        }
+
+        function atacar(tipoAtaque) {
+            if (verificarColisao()) {
+                aplicarDano('1', '2');
+                const dano = tipoAtaque === 'punch' ? player1Data.dano : player1Data.dano * 1.5;
+                player2Data.vida = Math.max(0, player2Data.vida - dano);
+                atualizarVida('2');
+            }
+        }
+
+        document.getElementById('punch').addEventListener('click', () => atacar('punch'));
+        document.getElementById('kick').addEventListener('click', () => atacar('kick'));
+       
+        function atualizarFisica() {
+            if (isJumping) {
+                verticalSpeed += gravity;
+                player1Y -= verticalSpeed;
+
+                if (player1Y <= 80) {
+                    player1Y = 80;
+                    isJumping = false;
+                    verticalSpeed = 0;
+                }
+            }
+
+            const player = document.getElementById('player1');
+            player.style.bottom = `${player1Y}px`;
+            player1Position += player1Speed;
+            player1Position = Math.max(0, Math.min(window.innerWidth - 100, player1Position));
+            player.style.left = `${player1Position}px`;
+
+            player1Speed *= 0.9;
+
+            requestAnimationFrame(atualizarFisica);
+        }
+
+        const joystick = nipplejs.create({
+            zone: document.getElementById('joystick'),
+            mode: 'static',
+            position: { left: '50%', top: '50%' },
+            color: 'white',
+            size: 100
+        });
+
+        joystick.on('move', (evt, data) => {
+            const speed = 5;
+            const player = document.getElementById('player1');
+
+            if (data.direction?.angle === 'left') {
+                player1Speed = -speed;
+                player.style.transform = 'scaleX(-1)';
+            } else if (data.direction?.angle === 'right') {
+                player1Speed = speed;
+                player.style.transform = 'scaleX(1)';
+            } else if (data.direction?.angle === 'up' && !isJumping) {
+                isJumping = true;
+                verticalSpeed = 15;
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !isJumping) {
+                isJumping = true;
+                verticalSpeed = 15;
+            }
+        });
+
+        carregarPersonagens();
+        atualizarFisica();
+
+
+    </script>
+</body>
+</html>
+
