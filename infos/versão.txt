@@ -1,0 +1,11 @@
+v0.1.0 . {
+    feita por:Ravy Novais Sales.
+    info:    
+    - Início de tudo.
+    - Seleção de personagem.
+    - e progesso no jogo.       
+}
+
+
+
+adiciona versão, a cada vez que você contribuir
