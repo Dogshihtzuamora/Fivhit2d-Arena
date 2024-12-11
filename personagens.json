@@ -1,0 +1,14 @@
+[
+  {
+    "id": "char01", 
+    "name": "Inie",
+    "image": "perso/inie/inie.png",
+    "code": "perso/inie/codigo.xml"
+  },
+  {
+    "id": "char02",
+    "name": "Inie Reverse", 
+    "image": "perso/inie reverse/inie reverse.png",
+    "code": "perso/inie reverse/codigo.xml"
+  }
+]
