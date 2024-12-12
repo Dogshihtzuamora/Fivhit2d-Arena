@@ -32,3 +32,11 @@ v0.1.4 .{
     description:
         - "add_personagem.html" aprimorado para receber mais de 1 sprites e com ações determinadas.
 }
+
+v0.1.5 .{
+    By: Ravy Novais Sales.
+    description:    
+        - Adiciondo barra de saúde com Imagem e nome do personagem.
+        - Adicionado sprite de soco e chute para "/inie".
+        - Mudado estilo de cor do "add_personagem.html".
+}

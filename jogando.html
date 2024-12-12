@@ -6,118 +6,171 @@
     <title>Jogo de Luta</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: #2a2a2a;
-        }
+       body {
+    margin: 0;
+    padding: 0;
+    background-color: #2a2a2a;
+    font-family: 'Arial', sans-serif;
+}
 
-        .game-container {
-            height: 100vh;
-            position: relative;
-            background: #333;
-            border-bottom: 5px solid #444;
-        }
+.game-container {
+    height: 100vh;
+    position: relative;
+    background: #333;
+    border-bottom: 5px solid #444; 
+    overflow: hidden;
+}
 
-        .player {
-            position: absolute;
-            bottom: 80px;
-        }
+.player {
+    position: absolute;
+    bottom: 80px;
+}
 
-        .player img {
-            height: 120px;
-        }
+.player img {
+    height: 120px;
+}
 
-        #player1 {
-            left: 100px;
-        }
+#player1 {
+    left: 100px;
+}
 
-        #player2 {
-            right: 100px;
-            transform: scaleX(-1);
-        }
+#player2 {
+    right: 100px;
+    transform: scaleX(-1);
+}
 
-        .health-bar {
-            height: 20px;
-            width: 200px;
-            background: #500;
-            border: 2px solid #fff;
-            position: absolute;
-            top: 20px;
-        }
+.health-bar {
+    height: 30px;
+    width: 300px;
+    background: #000;
+    border: 3px solid #888;
+    position: absolute;
+    top: 10px;
+    display: flex;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.7);
+}
 
-        #health1 { left: 20px; }
-        #health2 { right: 20px; }
+#health1 { 
+    left: 20px;
+    border-radius: 0 0 10px 0;
+}
 
-        .health-fill {
-            height: 100%;
-            background: red;
-            width: 100%;
-            transition: width 0.3s;
-        }
+#health2 { 
+    right: 20px;
+    border-radius: 0 0 0 10px;
+    flex-direction: row-reverse;
+}
 
-        #joystick {
-            position: absolute;
-            bottom: 20px;
-            left: 20%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 100px;
-        }
+.health-fill {
+    height: 100%;
+    background: linear-gradient(to right, #ff0000, #ff4444);
+    transition: width 0.3s;
+    box-shadow: 0 0 10px rgba(255,0,0,0.5);
+}
 
-        .player-name {
-            color: white;
-            position: absolute;
-            top: 45px;
-            font-family: Arial;
-        }
+.player-name {
+    color: #fff;
+    position: absolute;
+    top: 40px;
+    font-family: 'Arial Black', sans-serif;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-size: 18px;
+    letter-spacing: 1px;
+}
 
-        #name1 { left: 20px; }
-        #name2 { right: 20px; }
+#name1 { 
+    left: 20px; 
+    text-align: left;
+}
 
-        .buttons {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-        }
+#name2 { 
+    right: 20px; 
+    text-align: right;
+}
 
-        .attack-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: none;
-            background: #ff4444;
-            color: white;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-        }
+.health-bar img {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    top: -25px;
+    border: 3px solid #888;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    background: #333;
+}
 
-        .attack-btn:active {
-            transform: scale(0.95);
-        }
+#foto1 {
+    left: -40px;
+}
+
+#foto2 {
+    right: -40px;
+}
+
+#joystick {
+    position: absolute;
+    bottom: 20px;
+    left: 20%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+}
+
+.buttons {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.attack-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: #ff4444;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.attack-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+        
+        
     </style>
 </head>
 <body>
     <div class="game-container">
         <!-- aqui e o Player 1 -->
-        <div class="health-bar" id="health1">
-            <div class="health-fill" id="health1-fill"></div>
-        </div>
-        <div class="player-name" id="name1"></div>
-        <div id="player1" class="player">
-            <img id="sprite1" src="" alt="Player 1">
-        </div>
+      
+       <div class="health-bar" id="health1">
+    <div class="health-fill" id="health1-fill"></div>
+    <img id="foto1" src="" alt="foto do jogador 1">
+</div>
+<div class="player-name" id="name1"></div>
 
-        <!-- aqui e o Player 2 -->
-        <div class="health-bar" id="health2">
-            <div class="health-fill" id="health2-fill"></div>
-        </div>
-        <div class="player-name" id="name2"></div>
+<!-- Aqui é o Player 2 -->
+<div class="health-bar" id="health2">
+    <div class="health-fill" id="health2-fill"></div>
+    <img id="foto2" src="" alt="foto do jogador 2">
+</div>
+<div class="player-name" id="name2"></div>
+       
         <div id="player2" class="player">
             <img id="sprite2" src="" alt="Player 2">
+        </div>
+        
+        <div id="player1" class="player">
+            <img id="sprite1" src="" alt="Player 1">
         </div>
 
         <div id="joystick"></div>
@@ -129,4 +182,3 @@
     <script src="static/js/jogando.js"></script>
 </body>
 </html>
-

@@ -1,44 +1,54 @@
-let player1Position = 100;
-let player2Position = window.innerWidth - 200;
-let player1Speed = 0;
-let player2Speed = 0;
-let isPlayer1Jumping = false;
-let isPlayer2Jumping = false;
-let player1Y = 80;
-let player2Y = 80;
-let player1VerticalSpeed = 0;
-let player2VerticalSpeed = 0;
+const CONFIG = {
+    GRAVITY: 0.8,
+    JUMP_STRENGTH: 15,
+    GROUND_LEVEL: 80,
+    PLAYER_WIDTH: 100,
+    PLAYER_HEIGHT: 150,
+    MOVE_SPEED: 5
+};
 
-const GRAVITY = 0.8;
-const JUMP_STRENGTH = 15;
-const GROUND_LEVEL = 80;
-const PLAYER_WIDTH = 100;
-const PLAYER_HEIGHT = 150;
-const MOVE_SPEED = 5;
-
-let player1Data = { vida: 100, dano: 0 };
-let player2Data = { vida: 100, dano: 0 };
+const players = {
+    player1: {
+        position: 100,
+        speed: 0,
+        y: 80,
+        verticalSpeed: 0,
+        isJumping: false,
+        data: { vida: 0, dano: 0 },
+        sprites: {}
+    },
+    player2: {
+        position: window.innerWidth - 200,
+        speed: 0,
+        y: 80,
+        verticalSpeed: 0,
+        isJumping: false,
+        data: { vida: 0, dano: 0 },
+        sprites: {}
+    }
+};
 
 async function carregarPersonagens() {
     try {
         const response = await fetch('/static/personagens.json');
         const todosPersonagens = await response.json();
 
-        const p1Id = JSON.parse(localStorage.getItem('char1'))?.id;
-        const p2Id = JSON.parse(localStorage.getItem('char2'))?.id;
+        const playerIds = ['char1', 'char2'].map(key => 
+            JSON.parse(localStorage.getItem(key))?.id
+        );
 
-        const player1 = p1Id ? todosPersonagens.find(p => p.id === p1Id) : null;
-        const player2 = p2Id ? todosPersonagens.find(p => p.id === p2Id) : null;
-
-        if (player1) {
-            await interpretarCode('player1', player1.code);
-            document.getElementById('name1').textContent = player1.name;
-        }
-
-        if (player2) {
-            await interpretarCode('player2', player2.code);
-            document.getElementById('name2').textContent = player2.name;
-        }
+        playerIds.forEach((playerId, index) => {
+            const player = playerId ? todosPersonagens.find(p => p.id === playerId) : null;
+            if (player) {
+                const playerNum = index + 1;
+                const foto = document.getElementById(`foto${playerNum}`);
+                foto.src = player.image;
+                foto.alt = player.name;
+                document.getElementById(`name${playerNum}`).textContent = player.name;
+                
+                interpretarCode(`player${playerNum}`, player.code);
+            }
+        });
     } catch (error) {
         console.error('Erro ao carregar personagens:', error);
     }
@@ -52,41 +62,89 @@ async function interpretarCode(playerId, codeUrl) {
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
 
-        const vida = parseInt(xmlDoc.querySelector("vida")?.textContent || '100');
-        const dano = parseInt(xmlDoc.querySelector("dano")?.textContent || '0');
-        const sprite = xmlDoc.querySelector("sprite");
-        const spriteUrl = sprite?.getAttribute("url");
+        const playerIndex = playerId.slice(-1);
+        players[playerId].data.vida = parseInt(xmlDoc.querySelector("vida")?.textContent || '100');
+        players[playerId].data.dano = parseInt(xmlDoc.querySelector("dano")?.textContent || '0');
 
-        if (playerId === 'player1') {
-            player1Data = { vida, dano };
-        } else {
-            player2Data = { vida, dano };
+        const sprites = xmlDoc.querySelectorAll("sprite");
+        players[playerId].sprites = {};
+        sprites.forEach(sprite => {
+            const url = sprite.getAttribute("url");
+            const acao = sprite.getAttribute("acao");
+            players[playerId].sprites[acao] = url;
+        });
+
+        const spriteParado = players[playerId].sprites["parado"];
+        if (spriteParado) {
+            document.getElementById(`sprite${playerIndex}`).src = spriteParado;
         }
 
-        if (spriteUrl) {
-            document.getElementById(`sprite${playerId.slice(-1)}`).src = spriteUrl;
-        }
-
-        atualizarVida(playerId.slice(-1));
+        atualizarVida(playerIndex);
     } catch (error) {
         console.error(`Erro ao interpretar código do ${playerId}:`, error);
     }
 }
 
-function atualizarVida(playerId) {
-    const vida = playerId === '1' ? player1Data.vida : player2Data.vida;
-    const healthFill = document.getElementById(`health${playerId}-fill`);
-    healthFill.style.width = `${vida}%`;
+
+function mudarSprite(playerId, acao) {
+    const sprite = document.getElementById(`sprite${playerId.slice(-1)}`);
+    const spriteUrl = players[playerId].sprites[acao];
+    
+    if (spriteUrl) {
+        sprite.src = spriteUrl;
+        if (acao !== "parado") {
+            setTimeout(() => {
+                sprite.style.transition = 'opacity 100ms';
+                sprite.style.opacity = '0';
+                
+                setTimeout(() => {
+                    sprite.src = players[playerId].sprites["parado"];
+                    sprite.style.opacity = '1';
+                    
+                    setTimeout(() => {
+                        sprite.style.transition = '';
+                    }, 100);
+                }, 100);
+            }, 500);
+        }
+    }
 }
 
+
 function aplicarDano(atacante, defensor) {
-    const dano = atacante === '1' ? player1Data.dano : player2Data.dano;
-    if (defensor === '1') {
-        player1Data.vida = Math.max(0, player1Data.vida - dano);
-        atualizarVida('1');
-    } else {
-        player2Data.vida = Math.max(0, player2Data.vida - dano);
-        atualizarVida('2');
+    const dano = players[`player${atacante}`].data.dano;
+    players[`player${defensor}`].data.vida = Math.max(0, players[`player${defensor}`].data.vida - dano);
+    atualizarVida(defensor);
+}
+
+function atacar(tipoAtaque) {   
+    const acao = tipoAtaque === 'punch' ? 'soco' : 'chute';
+    mudarSprite('player1', acao);
+       
+    if (verificarColisaoPlayers()) {
+        const dano = tipoAtaque === 'punch' ? 
+            players.player1.data.dano : 
+            players.player1.data.dano * 1.5;
+        aplicarDano('1', '2');
+    }
+}
+
+function atualizarVida(playerId) {
+    const vida = players[`player${playerId}`].data.vida;
+    const healthFill = document.getElementById(`health${playerId}-fill`);
+    healthFill.style.width = `${vida}%`;
+
+    const nomeJogador = document.getElementById(`name${playerId}`).textContent;
+    
+    if (vida <= 0) {
+        mostrarAlertaVencedor(`${nomeJogador} perdeu!`);
+    }
+}
+
+function pular(player) {
+    if (!players[player].isJumping) {
+        players[player].isJumping = true;
+        players[player].verticalSpeed = CONFIG.JUMP_STRENGTH;
     }
 }
 
@@ -96,89 +154,55 @@ function verificarColisaoPlayers() {
     const p1Rect = player1.getBoundingClientRect();
     const p2Rect = player2.getBoundingClientRect();
 
-    const colisaoHorizontal = 
-        p1Rect.left < p2Rect.right && 
-        p1Rect.right > p2Rect.left;
-    
-    const colisaoVertical = 
-        p1Rect.top < p2Rect.bottom && 
-        p1Rect.bottom > p2Rect.top;
-
-    return colisaoHorizontal && colisaoVertical;
+    return p1Rect.left < p2Rect.right && 
+           p1Rect.right > p2Rect.left && 
+           p1Rect.top < p2Rect.bottom && 
+           p1Rect.bottom > p2Rect.top;
 }
 
-function atacar(tipoAtaque) {
+function atualizarFisica() {
+    ['player1', 'player2'].forEach(playerKey => {
+        const player = players[playerKey];
+        const playerElement = document.getElementById(playerKey);
+        
+        if (player.isJumping) {
+            player.verticalSpeed -= CONFIG.GRAVITY;
+            player.y += player.verticalSpeed;
+
+            if (player.y <= CONFIG.GROUND_LEVEL) {
+                player.y = CONFIG.GROUND_LEVEL;
+                player.isJumping = false;
+                player.verticalSpeed = 0;
+            }
+        }
+
+        player.position += player.speed;
+        player.position = Math.max(0, Math.min(window.innerWidth - CONFIG.PLAYER_WIDTH, player.position));
+
+        playerElement.style.left = `${player.position}px`;
+        playerElement.style.bottom = `${player.y}px`;
+
+        player.speed *= 0.9;
+    });
+
     if (verificarColisaoPlayers()) {
-        const dano = tipoAtaque === 'punch' ? player1Data.dano : player1Data.dano * 1.5;
-        aplicarDano('1', '2');
+        const p1 = players.player1;
+        const p2 = players.player2;
+
+        if (p1.position < p2.position) {
+            p1.position = p2.position - CONFIG.PLAYER_WIDTH;
+            p2.position = p1.position + CONFIG.PLAYER_WIDTH;
+        } else {
+            p2.position = p1.position - CONFIG.PLAYER_WIDTH;
+            p1.position = p2.position + CONFIG.PLAYER_WIDTH;
+        }
     }
+
+    requestAnimationFrame(atualizarFisica);
 }
 
 document.getElementById('punch').addEventListener('click', () => atacar('punch'));
 document.getElementById('kick').addEventListener('click', () => atacar('kick'));
-
-function pular(player) {
-    if (player === 'player1' && !isPlayer1Jumping) {
-        isPlayer1Jumping = true;
-        player1VerticalSpeed = JUMP_STRENGTH;
-    } else if (player === 'player2' && !isPlayer2Jumping) {
-        isPlayer2Jumping = true;
-        player2VerticalSpeed = JUMP_STRENGTH;
-    }
-}
-
-function atualizarFisica() {
-    const player1 = document.getElementById('player1');
-    const player2 = document.getElementById('player2');
-
-    if (isPlayer1Jumping) {
-        player1VerticalSpeed -= GRAVITY;
-        player1Y += player1VerticalSpeed;
-
-        if (player1Y <= GROUND_LEVEL) {
-            player1Y = GROUND_LEVEL;
-            isPlayer1Jumping = false;
-            player1VerticalSpeed = 0;
-        }
-    }
-
-    if (isPlayer2Jumping) {
-        player2VerticalSpeed -= GRAVITY;
-        player2Y += player2VerticalSpeed;
-
-        if (player2Y <= GROUND_LEVEL) {
-            player2Y = GROUND_LEVEL;
-            isPlayer2Jumping = false;
-            player2VerticalSpeed = 0;
-        }
-    }
-
-    player1Position += player1Speed;
-    player2Position += player2Speed;
-
-    player1Position = Math.max(0, Math.min(window.innerWidth - PLAYER_WIDTH, player1Position));
-    player2Position = Math.max(0, Math.min(window.innerWidth - PLAYER_WIDTH, player2Position));
-
-    if (verificarColisaoPlayers()) {
-        if (player1Position < player2Position) {
-            player1Position = player2Position - PLAYER_WIDTH;
-            player2Position = player1Position + PLAYER_WIDTH;
-        } else {
-            player2Position = player1Position - PLAYER_WIDTH;
-            player1Position = player2Position + PLAYER_WIDTH;
-        }
-    }
-
-    player1.style.left = `${player1Position}px`;
-    player1.style.bottom = `${player1Y}px`;
-    player2.style.left = `${player2Position}px`;
-    player2.style.bottom = `${player2Y}px`;
-
-    player1Speed *= 0.9;
-    player2Speed *= 0.9;
-
-    requestAnimationFrame(atualizarFisica);
-}
 
 const joystick = nipplejs.create({
     zone: document.getElementById('joystick'),
@@ -192,10 +216,10 @@ joystick.on('move', (evt, data) => {
     const player = document.getElementById('player1');
 
     if (data.direction?.angle === 'left') {
-        player1Speed = -MOVE_SPEED;
+        players.player1.speed = -CONFIG.MOVE_SPEED;
         player.style.transform = 'scaleX(-1)';
     } else if (data.direction?.angle === 'right') {
-        player1Speed = MOVE_SPEED;
+        players.player1.speed = CONFIG.MOVE_SPEED;
         player.style.transform = 'scaleX(1)';
     } else if (data.direction?.angle === 'up') {
         pular('player1');
@@ -210,11 +234,11 @@ document.addEventListener('keydown', (e) => {
             pular('player1');
             break;
         case 'ArrowLeft':
-            player1Speed = -MOVE_SPEED;
+            players.player1.speed = -CONFIG.MOVE_SPEED;
             player1.style.transform = 'scaleX(-1)';
             break;
         case 'ArrowRight':
-            player1Speed = MOVE_SPEED;
+            players.player1.speed = CONFIG.MOVE_SPEED;
             player1.style.transform = 'scaleX(1)';
             break;
     }
@@ -222,3 +246,36 @@ document.addEventListener('keydown', (e) => {
 
 carregarPersonagens();
 atualizarFisica();
+
+function mostrarAlertaVencedor(vencedor) {
+    const alerta = document.createElement('div');
+    alerta.id = 'alerta-vencedor';
+    alerta.textContent = vencedor;
+
+    document.body.appendChild(alerta);
+
+    const estiloAlerta = document.createElement('style');
+    estiloAlerta.textContent = `
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; transform: translate(-50%, -60%); }
+            10%, 90% { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        #alerta-vencedor {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px 40px;
+            border: 5px solid #ff4444;
+            border-radius: 10px;
+            font-size: 2rem;
+            text-align: center;
+            z-index: 9999;
+            animation: fadeInOut 3s ease-out;
+        }
+    `;
+    document.head.appendChild(estiloAlerta);
+
+    setTimeout(() => alerta.remove(), 3000);
+}
