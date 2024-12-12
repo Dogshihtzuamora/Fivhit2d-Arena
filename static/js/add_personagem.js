@@ -1,58 +1,77 @@
-document.getElementById('saveButton').addEventListener('click', () => {
+document.getElementById('addAction').addEventListener('click', () => {
+    const actionsContainer = document.getElementById('actionsContainer');
+    const actionGroup = document.createElement('div');
+    actionGroup.classList.add('actionGroup');
+
+    actionGroup.innerHTML = `
+        <label>Nome da Ação:</label>
+        <input type="text" class="actionName" placeholder="Ex: Correndo" required>
+
+        <label>Sprites (.png):</label>
+        <input type="file" class="actionSprites" accept="image/png" multiple required>
+    `;
+
+    actionsContainer.appendChild(actionGroup);
+});
+
+document.getElementById('saveButton').addEventListener('click', async () => {
     const name = document.getElementById('name').value.trim();
     const vida = document.getElementById('vida').value;
     const dano = document.getElementById('dano').value;
-    const spriteParado = document.getElementById('spriteParado').files[0];
-    const spritePulando = document.getElementById('spritePulando').files[0];
-    const spriteAndando = document.getElementById('spriteAndando').files[0];
+    const perfilFile = document.getElementById('perfil').files[0];
 
-    if (!name || !vida || !dano || !spriteParado || !spritePulando || !spriteAndando) {
-        alert('Por favor, preencha todos os campos e faça upload de todos os sprites.');
+    if (!name || !vida || !dano || !perfilFile) {
+        alert('Preencha todos os campos obrigatórios!');
         return;
     }
 
-    // Cria um objeto zip para armazenar os arquivos
+    const actions = [];
+    document.querySelectorAll('.actionGroup').forEach(group => {
+        const actionName = group.querySelector('.actionName').value.trim();
+        const actionSprites = group.querySelector('.actionSprites').files;
+
+        if (!actionName || actionSprites.length === 0) {
+            alert('Cada ação deve ter um nome e pelo menos um sprite!');
+            return;
+        }
+
+        actions.push({
+            name: actionName,
+            sprites: Array.from(actionSprites)
+        });
+    });
+
+    if (actions.length === 0) {
+        alert('Adicione pelo menos uma ação com sprites.');
+        return;
+    }
+
     const zip = new JSZip();
     const folder = zip.folder(name);
 
-    // Adiciona o arquivo XML
-    const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-<personagem>
-<vida>${vida}</vida>
-<dano>${dano}</dano>
-<sprite url="${name}/parado.png" acao="parado"></sprite>
-<sprite url="${name}/pulando.png" acao="pulando"></sprite>
-<sprite url="${name}/andando.png" acao="andando"></sprite>
-</personagem>`;
-    folder.file('codigo.xml', xmlContent);
+    folder.file('perfil.png', perfilFile);
+    const xmlContent = [
+        '<personagem>',
+        `    <vida>${vida}</vida>`,
+        `    <dano>${dano}</dano>`
+    ];
 
-    // Adiciona os sprites
-    const addFileToZip = (file, filename) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                folder.file(filename, event.target.result.split(',')[1], { base64: true });
-                resolve();
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        });
-    };
+    for (const action of actions) {
+        const actionFolder = folder.folder(action.name);
 
-    Promise.all([
-        addFileToZip(spriteParado, 'parado.png'),
-        addFileToZip(spritePulando, 'pulando.png'),
-        addFileToZip(spriteAndando, 'andando.png')
-    ]).then(() => {
-        // Gera o zip e oferece para download
-        zip.generateAsync({ type: 'blob' }).then((content) => {
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(content);
-            a.download = `${name}.zip`;
-            a.click();
+        action.sprites.forEach((sprite, index) => {
+            const spriteName = `frame_${index + 1}.png`;
+            actionFolder.file(spriteName, sprite);
+            xmlContent.push(`    <sprite url="${action.name}/${spriteName}" acao="${action.name}"></sprite>`);
         });
-    }).catch((error) => {
-        console.error('Erro ao processar os arquivos:', error);
-        alert('Ocorreu um erro ao salvar o personagem.');
-    });
+    }
+
+    xmlContent.push('</personagem>');
+    folder.file('codigo.xml', xmlContent.join('\n'));
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${name}.zip`;
+    link.click();
 });

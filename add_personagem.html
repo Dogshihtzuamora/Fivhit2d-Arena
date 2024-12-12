@@ -8,7 +8,7 @@
   --primary-color: #00ff00;
   --secondary-color: #b926b9;
   --text-color: #ffffff;
-  --background-color: #000000;
+  --background-color: #080303;
   --input-background: #1a1a1a;
   --input-border: #333333;
   --button-hover: #26ad26;
@@ -160,22 +160,27 @@ input[type="file"]::file-selector-button:hover {
         <label for="dano">Dano:</label>
         <input type="number" id="dano" name="dano" min="1" required>
 
+        <label for="perfil">Foto de Perfil (.png):</label>
+        <input type="file" id="perfil" name="perfil" accept="image/png" required>
+
         <fieldset>
             <legend>Sprites do Personagem</legend>
 
-            <label for="spriteParado">Sprite Parado (.png):</label>
-            <input type="file" id="spriteParado" name="spriteParado" accept="image/png" required>
+            <div id="actionsContainer">
+                <div class="actionGroup">
+                    <label>Nome da Ação:</label>
+                    <input type="text" class="actionName" placeholder="Ex: Parado" required>
 
-            <label for="spritePulando">Sprite Pulando (.png):</label>
-            <input type="file" id="spritePulando" name="spritePulando" accept="image/png" required>
+                    <label>Sprites (.png):</label>
+                    <input type="file" class="actionSprites" accept="image/png" multiple required>
+                </div>
+            </div>
 
-            <label for="spriteAndando">Sprite Andando (.png):</label>
-            <input type="file" id="spriteAndando" name="spriteAndando" accept="image/png" required>
+            <button type="button" id="addAction">Adicionar Nova Ação</button>
         </fieldset>
 
         <button type="button" id="saveButton">Salvar Personagem</button>
     </form>
-
     <script src="/static/js/add_personagem.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
