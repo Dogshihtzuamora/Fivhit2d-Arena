@@ -58,6 +58,10 @@ function selecionarPersonagem(event, char) {
     }
 }
 
+function criarPersonagens(){
+    window.location.href = 'add_personagem.html';
+}
+
 document.getElementById('jogar').onclick = () => {
     if (p1Selecionado && p2Selecionado) {
         window.location.href = 'jogando.html';

@@ -19,3 +19,10 @@ v0.1.2 .{
     description:
         - Mudanças na extensões ".txt" para ".md".
 }
+
+v0.1.3 .{
+    By: Victor de O. Nascimento.
+    description:
+        - Adicionado botao para criar Personagem em "jogo.html".
+        - Criada função para redirecionar de "jogo.html" para "add_personagem.html" (em "/static/js/jogo.js").
+}

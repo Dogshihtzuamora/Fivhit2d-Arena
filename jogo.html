@@ -59,6 +59,7 @@
 
         .selecionado-p1 {
             border: 3px solid var(--selection1);
+            
         }
 
         .selecionado-p2 {
@@ -69,6 +70,7 @@
             text-align: center;
             margin: 20px 0;
             font-size: 16px;
+            text-shadow: 0 0 10px var(--texts);
         }
 
         #jogar {
@@ -92,7 +94,9 @@
 <body>
     <div class="selection-person">
         <div class="status" id="status">Jogador 1, selecione seu personagem</div>
-        <div class="grid" id="grid"></div>
+        <div class="grid" id="grid">
+            <button onclick="criarPersonagens()" style="width: 80px; height: 80px; border: 1px solid var(--texts); color: green; font-size: xxx-large; cursor: pointer; position: relative; background-color: #1a1a1a;">+</button>
+        </div>
         <button id="jogar">JOGAR</button>
     </div>
 
