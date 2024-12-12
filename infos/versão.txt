@@ -1,11 +1,15 @@
-v0.1.0 . {
-    feita por:Ravy Novais Sales.
-    info:    
-    - Início de tudo.
-    - Seleção de personagem.
-    - e progesso no jogo.       
+v0.1.0 .{
+    By: Ravy Novais Sales.
+    description:    
+        - Início de tudo.
+        - Seleção de personagem.
+        - e progesso no jogo.       
 }
 
-
-
-adiciona versão, a cada vez que você contribuir
+v0.1.1 .{
+    By: Victor de O. Nascimento.
+    description:
+        - Organização de diretórios.
+        - Separação de scripts JS por paginas html.
+        - Adicionado README.md (em "/infos/project-tree") para Estrutura hierárquica do projeto.
+}
