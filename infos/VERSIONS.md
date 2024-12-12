@@ -13,3 +13,9 @@ v0.1.1 .{
         - Separação de scripts JS por paginas html.
         - Adicionado README.md (em "/infos/project-tree") para Estrutura hierárquica do projeto.
 }
+
+v0.1.2 .{
+    By: Victor de O. Nascimento.
+    description:
+        - Mudanças na extensões ".txt" para ".md".
+}

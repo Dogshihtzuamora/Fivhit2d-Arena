@@ -1,7 +1,0 @@
-1. Ravy Novais Sales. {
-    data: "10/12/2024"    
-}
-
-2. Victor de O. Nascimento. {
-    data: "11/12/2024"    
-}
