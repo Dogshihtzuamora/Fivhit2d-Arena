@@ -1,7 +1,9 @@
 <personagem>
     <vida>100</vida>
-    <dano>100</dano>
-    <sprite url="persons/inie/inie1.png" acao="parado"></sprite>
-    <sprite url="persons/inie/inie2.png" acao="soco" ></sprite>
-       <sprite url="persons/inie/inie3.png" acao="chute" ></sprite>
+    <dano>20</dano>
+    <sprite url="persons/inie/parado/frame_1.png" acao="parado"></sprite>
+    <sprite url="persons/inie/soco/frame_1.png" acao="soco" ></sprite>
+    <sprite url="persons/inie/soco/frame_1.png" acao="soco"></sprite>
+    <sprite url="persons/inie/chute/frame_1.png" acao="chute" ></sprite>
+    <sprite url="persons/inie/parado/frame_2.png" acao="chute"></sprite>
 </personagem>

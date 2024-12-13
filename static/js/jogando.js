@@ -4,7 +4,8 @@ const CONFIG = {
     GROUND_LEVEL: 80,
     PLAYER_WIDTH: 100,
     PLAYER_HEIGHT: 150,
-    MOVE_SPEED: 5
+    MOVE_SPEED: 5,
+    ANIMATION_SPEED: 100 // Velocidade entre frames em ms
 };
 
 const players = {
@@ -14,6 +15,7 @@ const players = {
         y: 80,
         verticalSpeed: 0,
         isJumping: false,
+        isAnimating: false,
         data: { vida: 0, dano: 0 },
         sprites: {}
     },
@@ -23,6 +25,7 @@ const players = {
         y: 80,
         verticalSpeed: 0,
         isJumping: false,
+        isAnimating: false,
         data: { vida: 0, dano: 0 },
         sprites: {}
     }
@@ -71,45 +74,72 @@ async function interpretarCode(playerId, codeUrl) {
         sprites.forEach(sprite => {
             const url = sprite.getAttribute("url");
             const acao = sprite.getAttribute("acao");
-            players[playerId].sprites[acao] = url;
+            if (!players[playerId].sprites[acao]) {
+                players[playerId].sprites[acao] = [];
+            }
+            players[playerId].sprites[acao].push(url);
         });
 
-        const spriteParado = players[playerId].sprites["parado"];
-        if (spriteParado) {
-            document.getElementById(`sprite${playerIndex}`).src = spriteParado;
-        }
-
+        iniciarAnimacaoParado(playerId);
         atualizarVida(playerIndex);
     } catch (error) {
         console.error(`Erro ao interpretar código do ${playerId}:`, error);
     }
 }
 
+function executarAnimacao(playerId, acao, callback) {
+    const spriteElement = document.getElementById(`sprite${playerId.slice(-1)}`);
+    const frames = players[playerId].sprites[acao];
 
-function mudarSprite(playerId, acao) {
-    const sprite = document.getElementById(`sprite${playerId.slice(-1)}`);
-    const spriteUrl = players[playerId].sprites[acao];
-    
-    if (spriteUrl) {
-        sprite.src = spriteUrl;
-        if (acao !== "parado") {
-            setTimeout(() => {
-                sprite.style.transition = 'opacity 100ms';
-                sprite.style.opacity = '0';
-                
-                setTimeout(() => {
-                    sprite.src = players[playerId].sprites["parado"];
-                    sprite.style.opacity = '1';
-                    
-                    setTimeout(() => {
-                        sprite.style.transition = '';
-                    }, 100);
-                }, 100);
-            }, 500);
-        }
+    if (frames && frames.length > 0) {
+        let frameIndex = 0;
+        players[playerId].isAnimating = true;
+
+        const animar = () => {
+            if (!players[playerId].isAnimating) return; // Garantir que a animação não continue se interrompida
+
+            spriteElement.src = frames[frameIndex];
+            frameIndex++;
+
+            if (frameIndex < frames.length) {
+                setTimeout(animar, CONFIG.ANIMATION_SPEED);
+            } else {
+                players[playerId].isAnimating = false; // Animação terminou
+                if (callback) {
+                    callback();
+                } else {
+                    iniciarAnimacaoParado(playerId); // Voltar para o estado "parado"
+                }
+            }
+        };
+
+        animar();
+    } else if (callback) {
+        callback();
+    } else {
+        iniciarAnimacaoParado(playerId);
     }
 }
 
+function iniciarAnimacaoParado(playerId) {
+    const spriteElement = document.getElementById(`sprite${playerId.slice(-1)}`);
+    const frames = players[playerId].sprites["parado"];
+
+    if (frames && frames.length > 0 && !players[playerId].isAnimating) {
+        let frameIndex = 0;
+
+        const animarParado = () => {
+            if (players[playerId].isAnimating) return; // Interrompe se outra animação começar
+
+            spriteElement.src = frames[frameIndex];
+            frameIndex = (frameIndex + 1) % frames.length;
+
+            setTimeout(animarParado, CONFIG.ANIMATION_SPEED);
+        };
+
+        animarParado();
+    }
+}
 
 function aplicarDano(atacante, defensor) {
     const dano = players[`player${atacante}`].data.dano;
@@ -119,14 +149,20 @@ function aplicarDano(atacante, defensor) {
 
 function atacar(tipoAtaque) {   
     const acao = tipoAtaque === 'punch' ? 'soco' : 'chute';
-    mudarSprite('player1', acao);
-       
-    if (verificarColisaoPlayers()) {
-        const dano = tipoAtaque === 'punch' ? 
-            players.player1.data.dano : 
-            players.player1.data.dano * 1.5;
-        aplicarDano('1', '2');
+    const playerId = 'player1';
+
+    if (!players[playerId].sprites[acao] || players[playerId].sprites[acao].length === 0) {
+        iniciarAnimacaoParado(playerId);
+        return;
     }
+
+    players[playerId].isAnimating = true;
+    executarAnimacao(playerId, acao, () => {
+        if (verificarColisaoPlayers()) {
+            aplicarDano('1', '2');
+        }
+        iniciarAnimacaoParado(playerId); // Voltar para "parado" após a ação
+    });
 }
 
 function atualizarVida(playerId) {

@@ -40,3 +40,11 @@ v0.1.5 .{
         - Adicionado sprite de soco e chute para "/inie".
         - Mudado estilo de cor do "add_personagem.html".
 }
+
+v0.1.6 .{
+    By: Victor de O. Nascimento.
+    description:
+        - Aprimorado sistema de sprites.
+        - Diretórios "/person" reestruturado.
+        - modelo "xml" modificado para seguir sprites por ação.
+}

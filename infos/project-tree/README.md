@@ -4,20 +4,37 @@ Fivhit2d-Arena
 ├─ add_personagem.html
 ├─ index.html
 ├─ infos
-│  ├─ creditos.txt
+│  ├─ CREDITS.md
 │  ├─ Logo.png
 │  ├─ project-tree
 │  │  └─ README.md
-│  └─ versão.txt
+│  └─ VERSIONS.md
 ├─ jogando.html
 ├─ jogo.html
 ├─ persons
 │  ├─ inie
+│  │  ├─ chute
+│  │  │  ├─ frame_1.png
+│  │  │  └─ frame_2.png
 │  │  ├─ codigo.xml
-│  │  └─ inie.png
+│  │  ├─ inie.png
+│  │  ├─ parado
+│  │  │  └─ frame_1.png
+│  │  └─ soco
+│  │     ├─ frame_1.png
+│  │     └─ frame_2.png
 │  └─ inie_reverse
+│     ├─ chute
+│     │  ├─ frame_1.png
+│     │  └─ frame_2.png
 │     ├─ codigo.xml
-│     └─ inie_reverse.png
+│     ├─ inie_reverse.png
+│     ├─ parado
+│     │  ├─ frame_1.png
+│     │  └─ frame_2.png
+│     └─ soco
+│        ├─ frame_1.png
+│        └─ frame_2.png
 └─ static
    ├─ js
    │  ├─ add_personagem.js
