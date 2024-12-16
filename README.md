@@ -22,6 +22,8 @@ Fivhit2D/
 │       │   ├── inie.png
 │       │   ├── parado/
 │       │   │   └── frame_1.png
+│       │   └── pulo/
+│       │       └── frame_4.png
 │       │   └── soco/
 │       │       ├── frame_1.png
 │       │       └── frame_2.png
@@ -66,7 +68,7 @@ Contém todos os recursos visuais utilizados no jogo:
 
 - **`logo.png`**: Logotipo principal do projeto.
 - **`personagens/`**: Diretório com personagens e suas respectivas animações e configurações:
-  - **`chute/`**, **`parado/`**, **`soco/`**: Frames de animação.
+  - **`chute/`**, **`parado/`**, **`pulo/`**, **`soco/`**: Frames de animação.
   - **`codigo.xml`**: Define os movimentos e atributos do personagem.
 
 ### **`docs/`**
