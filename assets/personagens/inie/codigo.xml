@@ -1,0 +1,36 @@
+<personagem>
+	<vida>100</vida>   
+	
+	<sprite
+		url="/assets/personagens/inie/parado/frame_1.png"
+		acao="parado" />
+	
+	<sprite
+		url="/assets/personagens/inie/soco/frame_1.png"
+		acao="soco"
+		dano="100" />
+	
+	<sprite
+		url="/assets/personagens/inie/soco/frame_1.png"
+		acao="soco" />
+	  
+	<sprite
+		url="/assets/personagens/inie/chute/frame_1.png"
+		acao="chute"
+		dano="10" />
+
+	<sprite
+		url="/assets/personagens/inie/chute/frame_1.png" 
+		acao="chute"
+		dano="10" />
+
+	<sprite
+		url="/assets/personagens/inie/pulo/frame_4.png"
+		acao="pulo"
+		tempo="600" />
+   
+	<sprite
+   		url="/assets/personagens/inie/pulo/frame_4.png"
+   		acao="pulo"
+   		tempo="600" />
+</personagem>

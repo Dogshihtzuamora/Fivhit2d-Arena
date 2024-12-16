@@ -5,7 +5,7 @@ const CONFIG = {
     PLAYER_WIDTH: 100,
     PLAYER_HEIGHT: 150,
     MOVE_SPEED: 5,
-    ANIMATION_SPEED: 100 // Velocidade entre frames em ms
+    ANIMATION_SPEED: 200
 };
 
 const players = {
@@ -16,7 +16,8 @@ const players = {
         verticalSpeed: 0,
         isJumping: false,
         isAnimating: false,
-        data: { vida: 0, dano: 0 },
+        isDead: false,
+        data: { vida: 0 },
         sprites: {}
     },
     player2: {
@@ -26,7 +27,8 @@ const players = {
         verticalSpeed: 0,
         isJumping: false,
         isAnimating: false,
-        data: { vida: 0, dano: 0 },
+        isDead: false,
+        data: { vida: 0 },
         sprites: {}
     }
 };
@@ -60,24 +62,34 @@ async function carregarPersonagens() {
 async function interpretarCode(playerId, codeUrl) {
     try {
         const response = await fetch(codeUrl);
-        const xmlContent = await response.text();
+        let xmlContent = await response.text();
+                
+        xmlContent = xmlContent.split('\n').filter(line => !line.trim().startsWith(';')).join('\n');
         
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
 
         const playerIndex = playerId.slice(-1);
         players[playerId].data.vida = parseInt(xmlDoc.querySelector("vida")?.textContent || '100');
-        players[playerId].data.dano = parseInt(xmlDoc.querySelector("dano")?.textContent || '0');
 
         const sprites = xmlDoc.querySelectorAll("sprite");
         players[playerId].sprites = {};
         sprites.forEach(sprite => {
             const url = sprite.getAttribute("url");
             const acao = sprite.getAttribute("acao");
+            const tempo = sprite.getAttribute("tempo") 
+                ? parseInt(sprite.getAttribute("tempo")) 
+                : CONFIG.ANIMATION_SPEED;
+            const dano = sprite.getAttribute("dano") ? parseInt(sprite.getAttribute("dano")) : 0;
+            
             if (!players[playerId].sprites[acao]) {
                 players[playerId].sprites[acao] = [];
             }
-            players[playerId].sprites[acao].push(url);
+            players[playerId].sprites[acao].push({
+                url: url,
+                dano: dano,
+                tempo: tempo 
+            });
         });
 
         iniciarAnimacaoParado(playerId);
@@ -96,19 +108,20 @@ function executarAnimacao(playerId, acao, callback) {
         players[playerId].isAnimating = true;
 
         const animar = () => {
-            if (!players[playerId].isAnimating) return; // Garantir que a animação não continue se interrompida
+            if (!players[playerId].isAnimating) return;
 
-            spriteElement.src = frames[frameIndex];
+            spriteElement.src = frames[frameIndex].url;
             frameIndex++;
 
-            if (frameIndex < frames.length) {
-                setTimeout(animar, CONFIG.ANIMATION_SPEED);
+            if (frameIndex < frames.length) {                
+                const tempoFrame = frames[frameIndex - 1].tempo || CONFIG.ANIMATION_SPEED;
+                setTimeout(animar, tempoFrame);
             } else {
-                players[playerId].isAnimating = false; // Animação terminou
+                players[playerId].isAnimating = false;
                 if (callback) {
                     callback();
                 } else {
-                    iniciarAnimacaoParado(playerId); // Voltar para o estado "parado"
+                    iniciarAnimacaoParado(playerId);
                 }
             }
         };
@@ -121,7 +134,9 @@ function executarAnimacao(playerId, acao, callback) {
     }
 }
 
-function iniciarAnimacaoParado(playerId) {
+function iniciarAnimacaoParado(playerId) {    
+    if (players[playerId].isDead) return;
+
     const spriteElement = document.getElementById(`sprite${playerId.slice(-1)}`);
     const frames = players[playerId].sprites["parado"];
 
@@ -129,20 +144,23 @@ function iniciarAnimacaoParado(playerId) {
         let frameIndex = 0;
 
         const animarParado = () => {
-            if (players[playerId].isAnimating) return; // Interrompe se outra animação começar
+            if (players[playerId].isAnimating || players[playerId].isDead) return;
 
-            spriteElement.src = frames[frameIndex];
+            spriteElement.src = frames[frameIndex].url;
             frameIndex = (frameIndex + 1) % frames.length;
-
-            setTimeout(animarParado, CONFIG.ANIMATION_SPEED);
+            
+            const tempoFrame = frames[frameIndex].tempo || CONFIG.ANIMATION_SPEED;
+            setTimeout(animarParado, tempoFrame);
         };
 
         animarParado();
     }
 }
 
-function aplicarDano(atacante, defensor) {
-    const dano = players[`player${atacante}`].data.dano;
+function aplicarDano(atacante, defensor, tipoAtaque) {
+    const frames = players[`player${atacante}`].sprites[tipoAtaque];
+    const dano = frames[0].dano; 
+    
     players[`player${defensor}`].data.vida = Math.max(0, players[`player${defensor}`].data.vida - dano);
     atualizarVida(defensor);
 }
@@ -150,6 +168,8 @@ function aplicarDano(atacante, defensor) {
 function atacar(tipoAtaque) {   
     const acao = tipoAtaque === 'punch' ? 'soco' : 'chute';
     const playerId = 'player1';
+   
+    if (players[playerId].isDead) return;
 
     if (!players[playerId].sprites[acao] || players[playerId].sprites[acao].length === 0) {
         iniciarAnimacaoParado(playerId);
@@ -159,28 +179,69 @@ function atacar(tipoAtaque) {
     players[playerId].isAnimating = true;
     executarAnimacao(playerId, acao, () => {
         if (verificarColisaoPlayers()) {
-            aplicarDano('1', '2');
+            aplicarDano('1', '2', acao);
         }
-        iniciarAnimacaoParado(playerId); // Voltar para "parado" após a ação
+        iniciarAnimacaoParado(playerId);
     });
 }
 
 function atualizarVida(playerId) {
-    const vida = players[`player${playerId}`].data.vida;
+    const player = players[`player${playerId}`];
+    const vida = player.data.vida;
     const healthFill = document.getElementById(`health${playerId}-fill`);
     healthFill.style.width = `${vida}%`;
 
     const nomeJogador = document.getElementById(`name${playerId}`).textContent;
     
-    if (vida <= 0) {
+    if (vida <= 0 && !player.isDead) {
+        player.isDead = true;
+               
+        if (player.sprites['morto'] && player.sprites['morto'].length > 0) {          
+            executarAnimacaoDeMorte(`player${playerId}`);
+        } else {           
+            mostrarAlertaVencedor(`${nomeJogador} perdeu!`);
+        }
+    }
+}
+
+function executarAnimacaoDeMorte(playerId) {
+    const spriteElement = document.getElementById(`sprite${playerId.slice(-1)}`);
+    const morteFrames = players[playerId].sprites['morto'];
+
+    if (morteFrames && morteFrames.length > 0) {
+        let frameIndex = 0;
+
+        const animarMorte = () => {
+            spriteElement.src = morteFrames[frameIndex].url;
+            frameIndex++;
+
+            if (frameIndex < morteFrames.length) {
+                setTimeout(animarMorte, CONFIG.ANIMATION_SPEED);
+            } else {              
+                const nomeJogador = document.getElementById(`name${playerId.slice(-1)}`).textContent;
+                mostrarAlertaVencedor(`${nomeJogador} perdeu!`);
+            }
+        };
+
+        animarMorte();
+    } else {        
+        const nomeJogador = document.getElementById(`name${playerId.slice(-1)}`).textContent;
         mostrarAlertaVencedor(`${nomeJogador} perdeu!`);
     }
 }
 
-function pular(player) {
+function pular(player) {    
+    if (players[player].isDead) return;
+
     if (!players[player].isJumping) {
         players[player].isJumping = true;
         players[player].verticalSpeed = CONFIG.JUMP_STRENGTH;
+       
+        if (players[player].sprites["pulo"] && players[player].sprites["pulo"].length > 0) {
+            executarAnimacao(player, "pulo", () => {               
+                iniciarAnimacaoParado(player);
+            });
+        }
     }
 }
 
@@ -198,7 +259,10 @@ function verificarColisaoPlayers() {
 
 function atualizarFisica() {
     ['player1', 'player2'].forEach(playerKey => {
-        const player = players[playerKey];
+        const player = players[playerKey];        
+       
+        if (player.isDead) return;
+
         const playerElement = document.getElementById(playerKey);
         
         if (player.isJumping) {
@@ -248,7 +312,9 @@ const joystick = nipplejs.create({
     size: 100
 });
 
-joystick.on('move', (evt, data) => {
+joystick.on('move', (evt, data) => {   
+    if (players.player1.isDead) return;
+
     const player = document.getElementById('player1');
 
     if (data.direction?.angle === 'left') {
@@ -257,14 +323,18 @@ joystick.on('move', (evt, data) => {
     } else if (data.direction?.angle === 'right') {
         players.player1.speed = CONFIG.MOVE_SPEED;
         player.style.transform = 'scaleX(1)';
-    } else if (data.direction?.angle === 'up') {
-        pular('player1');
     }
+});
+
+document.getElementById('jump').addEventListener('click', () => {
+    pular('player1');
 });
 
 document.addEventListener('keydown', (e) => {
     const player1 = document.getElementById('player1');
-    
+       
+    if (players.player1.isDead) return;
+
     switch(e.code) {
         case 'Space':
             pular('player1');

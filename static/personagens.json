@@ -2,13 +2,13 @@
   {
     "id": "char01", 
     "name": "Inie",
-    "image": "../persons/inie/inie.png",
-    "code": "../persons/inie/codigo.xml"
+    "image": "/assets/personagens/inie/inie.png",
+    "code": "/assets/personagens/inie/codigo.xml"
   },
   {
     "id": "char02",
     "name": "inie_reverse", 
-    "image": "../persons/inie_reverse/inie_reverse.png",
-    "code": "../persons/inie_reverse/codigo.xml"
+    "image": "/assets/personagens/inie_reverse/inie_reverse.png",
+    "code": "/assets/personagens/inie_reverse/codigo.xml"
   }
 ]
