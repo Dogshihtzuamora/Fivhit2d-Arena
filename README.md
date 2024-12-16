@@ -114,7 +114,12 @@ Arquivos HTML para a interface do usuário:
 
 1. **Clone o Repositório:**
    ```bash
+   # Via SSH
    git clone git@github.com:Dogshihtzuamora/fivhit2d-arena.git
+
+   # Via HTTPS
+   git clone https://github.com/Dogshihtzuamora/fivhit2d-arena
+
    cd fivhit2d-arena
    ```
 
