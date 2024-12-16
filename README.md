@@ -2,6 +2,8 @@
 
 **Fivhit2D Arena** é uma *engine* de luta 2D **open source** e totalmente personalizável, semelhante ao estilo do [M.U.G.E.N](https://mugenfreeforall.com). Com esta *engine*, você pode criar personagens, arenas e lutar em um ambiente dinâmico e flexível.
 
+[Teste agora clicando aqui](https://fivhit2d-arena.vercel.app/templates/jogo.html)
+
 ---
 
 ## 📁 Estrutura do Projeto
@@ -70,10 +72,6 @@ Contém todos os recursos visuais utilizados no jogo:
 - **`personagens/`**: Diretório com personagens e suas respectivas animações e configurações:
   - **`chute/`**, **`parado/`**, **`pulo/`**, **`soco/`**: Frames de animação.
   - **`codigo.xml`**: Define os movimentos e atributos do personagem.
-
-### **`docs/`**
-
-Contém documentação adicional, como guias de uso e especificações técnicas.
 
 ### **`static/`**
 
