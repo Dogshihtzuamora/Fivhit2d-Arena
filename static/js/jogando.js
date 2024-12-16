@@ -70,12 +70,29 @@ async function interpretarCode(playerId, codeUrl) {
         const xmlDoc = parser.parseFromString(xmlContent, "application/xml");
 
         const playerIndex = playerId.slice(-1);
+        
+       
+        const gravidadeElement = xmlDoc.querySelector("gravidade");
+        const gravidadePersonalizada = gravidadeElement 
+            ? parseFloat(gravidadeElement.textContent) 
+            : CONFIG.GRAVITY;
+        
+        const velocidadeElement = xmlDoc.querySelector("velocidade");
+        const velocidadePersonalizada = velocidadeElement
+            ? parseFloat(velocidadeElement.textContent)
+            : CONFIG.MOVE_SPEED;
+       
+        players[playerId].gravidade = gravidadePersonalizada;
+               
+        players[playerId].moveSpeed = velocidadePersonalizada;
+
         players[playerId].data.vida = parseInt(xmlDoc.querySelector("vida")?.textContent || '100');
 
         const sprites = xmlDoc.querySelectorAll("sprite");
         players[playerId].sprites = {};
         sprites.forEach(sprite => {
             const url = sprite.getAttribute("url");
+            const som = sprite.getAttribute("som");
             const acao = sprite.getAttribute("acao");
             const tempo = sprite.getAttribute("tempo") 
                 ? parseInt(sprite.getAttribute("tempo")) 
@@ -88,7 +105,8 @@ async function interpretarCode(playerId, codeUrl) {
             players[playerId].sprites[acao].push({
                 url: url,
                 dano: dano,
-                tempo: tempo 
+                tempo: tempo,
+                som: som
             });
         });
 
@@ -106,6 +124,10 @@ function executarAnimacao(playerId, acao, callback) {
     if (frames && frames.length > 0) {
         let frameIndex = 0;
         players[playerId].isAnimating = true;
+        
+          if (frames[0].som) {
+                    new Audio(frames[0].som).play();
+                }
 
         const animar = () => {
             if (!players[playerId].isAnimating) return;
@@ -157,12 +179,60 @@ function iniciarAnimacaoParado(playerId) {
     }
 }
 
-function aplicarDano(atacante, defensor, tipoAtaque) {
+function criarEstiloDano() {    
+    if (document.getElementById('estilo-dano')) return;
+
+    const estilo = document.createElement('style');
+    estilo.id = 'estilo-dano';
+    estilo.textContent = `
+        .dano-texto {
+            color: red;
+            font-weight: bold;
+            font-size: 20px;
+            position: absolute;
+            pointer-events: none;
+            animation: flutuar 1s ease-out;
+        }
+
+        @keyframes flutuar {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+    `;
+
+    document.head.appendChild(estilo);
+}
+
+function aplicarDano(atacante, defensor, tipoAtaque) {    
+    criarEstiloDano();
+
     const frames = players[`player${atacante}`].sprites[tipoAtaque];
     const dano = frames[0].dano; 
     
     players[`player${defensor}`].data.vida = Math.max(0, players[`player${defensor}`].data.vida - dano);
     atualizarVida(defensor);
+    
+    const elementoDano = document.createElement('div');
+    elementoDano.classList.add('dano-texto');
+    elementoDano.textContent = `-${dano}`;
+    
+    const defensorElemento = document.getElementById(`player${defensor}`);
+    const rect = defensorElemento.getBoundingClientRect();
+    
+    elementoDano.style.left = `${rect.left + rect.width / 2}px`;
+    elementoDano.style.top = `${rect.top}px`;
+    
+    document.body.appendChild(elementoDano);
+    
+    setTimeout(() => {
+        document.body.removeChild(elementoDano);
+    }, 1000);
 }
 
 function atacar(tipoAtaque) {   
@@ -210,6 +280,10 @@ function executarAnimacaoDeMorte(playerId) {
 
     if (morteFrames && morteFrames.length > 0) {
         let frameIndex = 0;
+       
+        if (morteFrames[0].som) {
+            new Audio(morteFrames[0].som).play();
+        }
 
         const animarMorte = () => {
             spriteElement.src = morteFrames[frameIndex].url;
@@ -265,8 +339,12 @@ function atualizarFisica() {
 
         const playerElement = document.getElementById(playerKey);
         
-        if (player.isJumping) {
-            player.verticalSpeed -= CONFIG.GRAVITY;
+        if (player.isJumping) {            
+            const gravidade = player.gravidade !== undefined 
+                ? player.gravidade 
+                : CONFIG.GRAVITY;
+
+            player.verticalSpeed -= gravidade;
             player.y += player.verticalSpeed;
 
             if (player.y <= CONFIG.GROUND_LEVEL) {
@@ -304,6 +382,10 @@ function atualizarFisica() {
 document.getElementById('punch').addEventListener('click', () => atacar('punch'));
 document.getElementById('kick').addEventListener('click', () => atacar('kick'));
 
+document.getElementById('jump').addEventListener('click', () => {
+    pular('player1');
+});
+
 const joystick = nipplejs.create({
     zone: document.getElementById('joystick'),
     mode: 'static',
@@ -316,18 +398,16 @@ joystick.on('move', (evt, data) => {
     if (players.player1.isDead) return;
 
     const player = document.getElementById('player1');
+   
+    const moveSpeed = players.player1.moveSpeed || CONFIG.MOVE_SPEED;
 
     if (data.direction?.angle === 'left') {
-        players.player1.speed = -CONFIG.MOVE_SPEED;
+        players.player1.speed = -moveSpeed;
         player.style.transform = 'scaleX(-1)';
     } else if (data.direction?.angle === 'right') {
-        players.player1.speed = CONFIG.MOVE_SPEED;
+        players.player1.speed = moveSpeed;
         player.style.transform = 'scaleX(1)';
     }
-});
-
-document.getElementById('jump').addEventListener('click', () => {
-    pular('player1');
 });
 
 document.addEventListener('keydown', (e) => {
@@ -335,16 +415,18 @@ document.addEventListener('keydown', (e) => {
        
     if (players.player1.isDead) return;
 
+    const moveSpeed = players.player1.moveSpeed || CONFIG.MOVE_SPEED;
+
     switch(e.code) {
         case 'Space':
             pular('player1');
             break;
         case 'ArrowLeft':
-            players.player1.speed = -CONFIG.MOVE_SPEED;
+            players.player1.speed = -moveSpeed;
             player1.style.transform = 'scaleX(-1)';
             break;
         case 'ArrowRight':
-            players.player1.speed = CONFIG.MOVE_SPEED;
+            players.player1.speed = moveSpeed;
             player1.style.transform = 'scaleX(1)';
             break;
     }
