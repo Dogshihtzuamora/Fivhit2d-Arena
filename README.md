@@ -9,51 +9,45 @@
 ## 📁 Estrutura do Projeto
 
 ```plaintext
-Fivhit2D/
-│
-├── CREDITS.md
-│
-├── assets/
-│   ├── logo.png
-│   └── personagens/
-│       ├── inie/
-│       │   ├── chute/
-│       │   │   ├── frame_1.png
-│       │   │   └── frame_2.png
-│       │   ├── codigo.xml
-│       │   ├── inie.png
-│       │   ├── parado/
-│       │   │   └── frame_1.png
-│       │   └── pulo/
-│       │       └── frame_4.png
-│       │   └── soco/
-│       │       ├── frame_1.png
-│       │       └── frame_2.png
-│       └── inie_reverse/
-│           ├── chute/
-│           │   ├── frame_1.png
-│           │   └── frame_2.png
-│           ├── codigo.xml
-│           ├── codigo.xml.bak
-│           ├── inie_reverse.png
-│           ├── parado/
-│           │   ├── frame_1.png
-│           │   └── frame_2.png
-│           └── soco/
-│               ├── frame_1.png
-│               └── frame_2.png
-│
-├── static/
-│   ├── js/
-│   │   ├── add_personagem.js
-│   │   ├── jogando.js
-│   │   └── jogo.js
-│   └── personagens.json
-│
-└── templates/
-    ├── add_personagem.html
-    ├── jogando.html
-    └── jogo.html
+Fivhit2d-Arena
+
+├─ CREDITS.md
+├─ assets
+│  ├─ logo.png
+│  └─ personagens
+│     ├─ inie
+│     │  ├─ chute
+│     │  │  └─ frame_1.png
+│     │  ├─ codigo.xml
+│     │  ├─ inie.png
+│     │  ├─ parado
+│     │  │  └─ frame_1.png
+│     │  ├─ pulo
+│     │  │  └─ frame_1.png
+│     │  └─ soco
+│     │     └─ frame_1.png
+│     └─ inie_reverse
+│        ├─ chute
+│        │  └─ frame_1.png
+│        ├─ codigo.xml
+│        ├─ inie_reverse.png
+│        ├─ parado
+│        │  └─ frame_1.png
+│        ├─ pulo
+│        │  └─ frame_1.png
+│        └─ soco
+│           └─ frame_1.png
+├─ static
+│  ├─ js
+│  │  ├─ add_personagem.js
+│  │  ├─ jogando.js
+│  │  └─ jogo.js
+│  └─ personagens.json
+└─ templates
+   ├─ add_personagem.html
+   ├─ jogando.html
+   └─ jogo.html
+
 ```
 
 ---
