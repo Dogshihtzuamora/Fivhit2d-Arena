@@ -1,10 +1,36 @@
 <personagem>
-    <vida>100</vida>
-    <dano>10</dano>
-    <sprite url="/assets/personagens/inie_reverse/parado/frame_1.png" acao="parado"></sprite>
-    <sprite url="/assets/personagens/inie_reverse/parado/frame_2.png" acao="parado"></sprite>
-    <sprite url="/assets/personagens/inie_reverse/soco/frame_1.png" acao="soco" ></sprite>
-    <sprite url="/assets/personagens/inie_reverse/soco/frame_2.png" acao="soco" ></sprite>
-    <sprite url="/assets/personagens/inie_reverse/chute/frame_1.png" acao="chute" ></sprite>
-    <sprite url="/assets/personagens/inie_reverse/chute/frame_2.png" acao="chute" ></sprite>
+	<vida>100</vida>   
+	
+	<sprite
+		url="/assets/personagens/inie_reverse/parado/frame_1.png"
+		acao="parado" />
+	
+	<sprite
+		url="/assets/personagens/inie_reverse/soco/frame_1.png"
+		acao="soco"
+		dano="100" />
+	
+	<sprite
+		url="/assets/personagens/inie_reverse/soco/frame_1.png"
+		acao="soco" />
+	  
+	<sprite
+		url="/assets/personagens/inie_reverse/chute/frame_1.png"
+		acao="chute"
+		dano="10" />
+
+	<sprite
+		url="/assets/personagens/inie_reverse/chute/frame_1.png" 
+		acao="chute"
+		dano="10" />
+
+	<sprite
+		url="/assets/personagens/inie_reverse/pulo/frame_1.png"
+		acao="pulo"
+		tempo="600" />
+   
+	<sprite
+   		url="/assets/personagens/inie_reverse/pulo/frame_1.png"
+   		acao="pulo"
+   		tempo="600" />
 </personagem>

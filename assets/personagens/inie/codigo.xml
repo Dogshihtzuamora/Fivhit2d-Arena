@@ -25,12 +25,12 @@
 		dano="10" />
 
 	<sprite
-		url="/assets/personagens/inie/pulo/frame_4.png"
+		url="/assets/personagens/inie/pulo/frame_1.png"
 		acao="pulo"
 		tempo="600" />
    
 	<sprite
-   		url="/assets/personagens/inie/pulo/frame_4.png"
+   		url="/assets/personagens/inie/pulo/frame_1.png"
    		acao="pulo"
    		tempo="600" />
 </personagem>
