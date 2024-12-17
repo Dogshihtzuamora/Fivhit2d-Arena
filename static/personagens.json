@@ -1,12 +1,12 @@
 [
   {
-    "id": "char01", 
+    "id": "char1", 
     "name": "Inie",
     "image": "/assets/personagens/inie/inie.png",
     "code": "/assets/personagens/inie/codigo.xml"
   },
   {
-    "id": "char02",
+    "id": "char2",
     "name": "inie_reverse", 
     "image": "/assets/personagens/inie_reverse/inie_reverse.png",
     "code": "/assets/personagens/inie_reverse/codigo.xml"

@@ -4,185 +4,193 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        :root {
-  --primary-color: #ffffff;
-  --secondary-color: #929292;
-  --text-color: #ffffff;
-  --background-color: #080303;
-  --input-background: #1a1a1a;
-  --input-border: #333333;
-  --button-hover: #adadad;
-}
+      :root {
+        --primary-color: #ffffff2c;
+        --secondary-color: #929292;
+        --text-color: #ffffff;
+        --background-color: #080303;
+        --input-background: #1a1a1a;
+        --input-border: #333333;
+        --button-hover: #adadad;
+      }
 
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: monospace;
-  line-height: 1.6;
-  margin: 0;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-}
+      body {
+        background-color: var(--background-color);
+        color: var(--text-color);
+        font-family: monospace;
+        line-height: 1.6;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
 
-h1 {
-  color: var(--primary-color);
-  text-align: center;
-  margin-bottom: 30px;
-  font-size: 2.5rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px var(--primary-color);
-}
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 2.5rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-shadow: 0 0 10px var(--primary-color);
+      }
 
-form {
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-  width: 100%;
-  max-width: 500px;
-}
+      form {
+        background-color: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        width: 100%;
+        max-width: 500px;
+      }
 
-label {
-  display: block;
-  margin-bottom: 5px;
-  color: var(--secondary-color);
-  font-weight: bold;
-}
+      label {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--secondary-color);
+        font-weight: bold;
+      }
 
-input[type="text"],
-input[type="number"],
-input[type="file"] {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  background-color: var(--input-background);
-  border: 1px solid var(--input-border);
-  border-radius: 5px;
-  color: var(--text-color);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
+      input[type="text"],
+      input[type="number"],
+      input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        background-color: var(--input-background);
+        border: 1px solid var(--input-border);
+        border-radius: 5px;
+        color: var(--text-color);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
 
-input[type="text"]:focus,
-input[type="number"]:focus,
-input[type="file"]:focus {
-  outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 5px var(--primary-color);
-}
+      input[type="text"]:focus,
+      input[type="number"]:focus,
+      input[type="file"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 5px var(--primary-color);
+      }
 
-fieldset {
-  border: 1px solid var(--input-border);
-  border-radius: 5px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
+      fieldset {
+        border: 1px solid var(--input-border);
+        border-radius: 5px;
+        padding: 20px;
+        margin-bottom: 20px;
+      }
 
-legend {
-  color: var(--primary-color);
-  font-weight: bold;
-  padding: 0 10px;
-}
+      legend {
+        color: var(--primary-color);
+        font-weight: bold;
+        padding: 0 10px;
+      }
 
-button {
-  background-color: var(--primary-color);
-  color: var(--background-color);
-  padding: 12px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  transition: background-color 0.3s ease, transform 0.1s ease;
-  width: 100%;
-}
+      button {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: background-color 0.3s ease, transform 0.1s ease;
+        width: 100%;
+      }
 
-button:hover {
-  background-color: var(--button-hover);
-  transform: translateY(-2px);
-}
+      button:hover {
+        background-color: var(--button-hover);
+        transform: translateY(-2px);
+      }
 
-button:active {
-  transform: translateY(0);
-}
+      button:active {
+        transform: translateY(0);
+      }
 
-@media (max-width: 600px) {
-  form {
-    padding: 20px;
-  }
+      @media (max-width: 600px) {
+        form {
+          padding: 20px;
+        }
 
-  h1 {
-    font-size: 2rem;
-  }
-}
+        h1 {
+          font-size: 2rem;
+        }
+      }
 
-/* Custom file input styling */
-input[type="file"] {
-  border: 1px solid var(--input-border);
-  background-color: var(--input-background);
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-}
+      /* Custom file input styling */
+      input[type="file"] {
+        border: 1px solid var(--input-border);
+        background-color: var(--input-background);
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
 
-input[type="file"]::file-selector-button {
-  background-color: var(--primary-color);
-  color: var(--background-color);
-  padding: 8px 16px;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
+      input[type="file"]::file-selector-button {
+        background-color: var(--primary-color);
+        color: var(--background-color);
+        padding: 8px 16px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
 
-input[type="file"]::file-selector-button:hover {
-  background-color: var(--button-hover);
-}
-
-
-    </style>
+      input[type="file"]::file-selector-button:hover {
+        background-color: var(--button-hover);
+      }
+  </style>
     <title>Adicionar Personagem</title>
 </head>
 <body>
-    <h1>Adicionar Novo Personagem</h1>
-    <form id="characterForm">
-        <label for="name">Nome do Personagem:</label>
-        <input type="text" id="name" name="name" required>
+  <h1>Adicionar Novo Personagem</h1>
+  <form id="characterForm">
+      <label for="name">Nome do Personagem:</label>
+      <input type="text" id="name" name="name" required>
 
-        <label for="vida">Vida:</label>
-        <input type="number" id="vida" name="vida" min="1" required>
+      <label for="vida">Vida:</label>
+      <input type="number" id="vida" name="vida" min="1" required>
 
-        <label for="dano">Dano:</label>
-        <input type="number" id="dano" name="dano" min="1" required>
+      <label for="perfil">Foto de Perfil (.png):</label>
+      <input type="file" id="perfil" name="perfil" accept="image/png" required>
 
-        <label for="perfil">Foto de Perfil (.png):</label>
-        <input type="file" id="perfil" name="perfil" accept="image/png" required>
+      <fieldset>
+          <legend>Sprites do Personagem</legend>
 
-        <fieldset>
-            <legend>Sprites do Personagem</legend>
+          <label for="actionSelect">Escolha uma Ação:</label>
+          <select id="actionSelect" required>
+              <option value="" disabled selected>Selecione uma ação</option>
+              <option value="parado">parado</option>
+              <option value="pulo">pulo</option>
+              <option value="soco">soco</option>
+              <option value="chute">chute</option>
+          </select>
 
-            <div id="actionsContainer">
-                <div class="actionGroup">
-                    <label>Nome da Ação:</label>
-                    <input type="text" class="actionName" placeholder="Ex: Parado" required>
+          <div id="danoInput" style="display: none;">
+              <label for="dano">Dano para esta ação:</label>
+              <input type="number" id="dano" name="dano" min="1">
+          </div>
 
-                    <label>Sprites (.png):</label>
-                    <input type="file" class="actionSprites" accept="image/png" multiple required>
-                </div>
-            </div>
+          <div id="tempoInput" style="display: none;">
+              <label for="tempo">Tempo de Execução para Pulo (ms):</label>
+              <input type="number" id="tempo" name="tempo" min="1" placeholder="Milissegundos">
+          </div>
 
-            <button type="button" id="addAction">Adicionar Nova Ação</button>
-        </fieldset>
+          <label for="actionSprites">Sprites da Ação (.png):</label>
+          <input type="file" id="actionSprites" accept="image/png" multiple required>
 
-        <button type="button" id="saveButton">Salvar Personagem</button>
+          <button type="button" id="addAction">Adicionar Ação</button>
+          <div id="actionsContainer"></div>
+      </fieldset>
+
+      <button type="button" id="saveButton">Salvar Personagem</button>
     </form>
-    <script src="/static/js/add_personagem.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
+  <script src="/static/js/add_personagem.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </body>
 </html>
