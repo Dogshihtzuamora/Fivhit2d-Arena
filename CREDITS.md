@@ -10,7 +10,7 @@
   - **v1.0.0**: Adicionando botão de pulo, sprites de pulo e alterou informações no xml.
     - **v1.2.0**: Adição de tag novas como gravidade,velocidade, e também tendo novo atributo sendo o som, mostar o dano mostrandoa messagem de dano.
   
-- **Victor de O. Nascimento**  
+- **ON00dev**  
   - **v0.1.1**: Organização de diretórios, separação de scripts JS por páginas HTML, adição de README.md para estrutura hierárquica do projeto.  
   - **v0.1.2**: Mudança de extensões de ".txt" para ".md".  
   - **v0.2.0**:
